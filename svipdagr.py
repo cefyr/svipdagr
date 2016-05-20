@@ -7,38 +7,34 @@ Original idea of code copypasted from http://rowinggolfer.blogspot.se/2011/06/py
 import sys
 from PyQt4 import QtGui, QtCore
 
-class RightClickMenu(QtGui.QMenu):
-    def __init__(self, parent=None):
-        QtGui.QMenu.__init__(self, "Svipdagr", parent)
 
-        quit_action = QtGui.QAction("&Quit", self)
-        self.addAction(quit_action)
-        quit_action.triggered.connect(QtGui.qApp.quit)
-
-    def closeEvent(self, event):
-        # 1st string is titlebar, 2nd is message, last param is default btn
-        # Note that reply is a varaible that stores the return value!
-        reply = QtGui.QMessageBox.question(self, 'Message',
-                "Are you sure you want to quit?", QtGui.QMessageBox.Yes |
-                QtGui.QMessageBox.No, QtGui.QMessageBox.No)
-        if reply == QtGui.QMessageBox.Yes:
-            event.accept()
-        else:
-            event.ignore()
-
-    
 class SysTrayIcon(QtGui.QSystemTrayIcon):
     def __init__(self, parent=None):
         super().__init__()
+        self.icon = self.init_icon()
         self.gui = GUI()
 
-        self.setIcon(QtGui.QIcon.fromTheme("exit24.png"))
+        #self.setIcon(QtGui.QIcon.fromTheme("exit24.png"))
+        self.setIcon(self.icon)
         self.setToolTip('This is a tooltip for the icon')
         self.activated.connect(self.click_trap)
 
         self.right_menu = RightClickMenu()
-        self.setContextMenu(self.right_menu)
+        #self.setContextMenu(self.right_menu) #TODO see issue #4
     
+    def init_icon(self):
+        #TODO Figure out the right color
+        color = 'blue'
+        pixmap = QtGui.QPixmap(100, 100)
+        pixmap.fill(QtGui.QColor(color))
+#        color = QtGui.QColor()
+#        pixmap = QtGui.QPixmap("icon.png")
+#        painter = QtGui.QPainter(pixmap)
+#        painter.setCompositionMode(QtGui.QPainter.CompositionMode_SourceIn)
+#        painter.setBrush(color)
+#        painter.setPen(color)
+#        painter.drawRect(pixmap.rect())
+        return QtGui.QIcon(pixmap)
 
     def click_trap(self, value):
         if value == self.Trigger: #left click!
@@ -109,8 +105,29 @@ class GUI(QtGui.QWidget):
         else:
             event.ignore()
         
-def main():
 
+
+class RightClickMenu(QtGui.QMenu): #NOTE Inactive right now
+    def __init__(self, parent=None):
+        QtGui.QMenu.__init__(self, "Svipdagr", parent)
+
+        quit_action = QtGui.QAction("&Quit", self)
+        self.addAction(quit_action)
+        quit_action.triggered.connect(QtGui.qApp.quit)
+
+    def closeEvent(self, event):
+        # 1st string is titlebar, 2nd is message, last param is default btn
+        # Note that reply is a varaible that stores the return value!
+        reply = QtGui.QMessageBox.question(self, 'Message',
+                "Are you sure you want to quit?", QtGui.QMessageBox.Yes |
+                QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+        if reply == QtGui.QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
+
+
+def main():
     app = QtGui.QApplication(sys.argv)
     tray = SysTrayIcon()
     tray.show()
