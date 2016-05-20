@@ -1,0 +1,7 @@
+{
+    "reveille": "07:00",
+    "optimum_sleep": "8:00",
+    "minute_format": "True",
+    "color_early": [0, 255, 0],
+    "color_late": [255, 0, 0]
+}
